@@ -1,0 +1,6 @@
+@KwazyPixels_HostAddress = http://localhost:5150
+
+GET {{KwazyPixels_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
