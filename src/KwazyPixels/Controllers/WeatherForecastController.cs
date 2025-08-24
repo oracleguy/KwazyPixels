@@ -2,6 +2,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace KwazyPixels.Controllers
 {
+    /// <summary>
+    /// Hot out there today.
+    /// </summary>
     [ApiController]
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
@@ -18,6 +21,10 @@ namespace KwazyPixels.Controllers
             _logger = logger;
         }
 
+        /// <summary>
+        /// Get the weather forecast for the next 5 days.
+        /// </summary>
+        /// <returns></returns>
         [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {
