@@ -34,8 +34,9 @@ public class GalleryController(IGalleryCollection galleryCollection, IImageProce
     /// <param name="height"></param>
     /// <param name="resizeMode"></param>
     /// <returns></returns>
-    [HttpGet("{galleryIndex}")]
+    [HttpGet("{galleryIndex}/next")]
     [ProducesErrorResponseType(typeof(string))]
+    [ProducesResponseType<FileStreamResult>(StatusCodes.Status200OK)]
     public IActionResult GetNextImage([FromRoute] int galleryIndex, [FromQuery] int width = 1920, [FromQuery] int height = 1080,
         [FromQuery] ResizeMode resizeMode = ResizeMode.Fill)
     {
@@ -54,5 +55,24 @@ public class GalleryController(IGalleryCollection galleryCollection, IImageProce
         {
             return File(stream, mimeType);
         }
+    }
+
+    /// <summary>
+    /// Gets detailed information about a specific gallery.
+    /// </summary>
+    /// <param name="galleryIndex">The gallery index to access.</param>
+    /// <returns></returns>
+    [HttpGet("{galleryIndex}")]
+    [ProducesErrorResponseType(typeof(string))]
+    [ProducesResponseType<GalleryInfoDetail>(StatusCodes.Status200OK)]
+    public IActionResult GetGalleryInfo([FromRoute] int galleryIndex)
+    {
+        if (galleryIndex < 0 || galleryIndex >= GalleryCollection.Galleries.Count)
+        {
+            return NotFound($"Gallery with index {galleryIndex} not found.");
+        }
+        var gallery = GalleryCollection.Galleries[galleryIndex];
+        var galleryInfo = new GalleryInfoDetail(gallery.Name, galleryIndex, gallery.TotalImageCount);
+        return Ok(galleryInfo);
     }
 }

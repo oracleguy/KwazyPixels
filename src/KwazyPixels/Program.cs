@@ -12,7 +12,9 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         // Explicitly add environment variables to configuration
-        builder.Configuration.AddEnvironmentVariables();
+        builder.Configuration.AddEnvironmentVariables("KWAZYPX_");
+        var galleryConfigFile = builder.Configuration.GetValue<string>("GALLERY_CONFIG") ?? "galleries.json";
+        builder.Configuration.AddJsonFile(galleryConfigFile, optional: true, reloadOnChange: false);
 
         builder.Services.AddSingleton<IGalleryCollection, Services.GalleryCollection>();
         builder.Services.AddTransient<IImageProcessor, Services.ImageProcessor>();
@@ -46,10 +48,27 @@ public class Program
         {
             options.AddDefaultPolicy(policy =>
             {
-                policy.AllowAnyOrigin()
-                      .WithMethods("GET")
+                if(builder.Configuration.GetValue<string>("ALLOWED_ORIGINS") is string origins && string.IsNullOrWhiteSpace(origins) == false)
+                {
+                    var splitOrigins = origins.Split(new char[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                    policy.WithOrigins(splitOrigins);
+                }
+                else
+                {
+                    policy.AllowAnyOrigin();
+                }
+                policy.WithMethods("GET")
                       .AllowAnyHeader();
             });
+        });
+
+        builder.Services.AddHealthChecks();
+
+        builder.Services.AddHsts(options =>
+        {
+            options.Preload = true;
+            options.IncludeSubDomains = true;
+            options.MaxAge = TimeSpan.FromSeconds(31536000); // 1 year
         });
 
         var app = builder.Build();
@@ -58,6 +77,12 @@ public class Program
         if (app.Environment.IsDevelopment())
         {
             app.MapOpenApi();
+        }
+
+        app.UseHealthChecks("/health");
+        if (app.Environment.IsDevelopment() == false)
+        {
+            app.UseHsts();
         }
 
         app.UseSwagger();

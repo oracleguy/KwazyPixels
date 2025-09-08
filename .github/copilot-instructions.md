@@ -6,6 +6,7 @@ This project is a web API application that provides image randomization and gall
 - `src/`: Contains the source code of the application.
 - `tests/`: Contains unit tests for the application.
 - The Visual Studio solution file is located at the root of the repository.
+- The `Dockerfile` is located at `src/KwazyPixels/Dockerfile`.
 
 ## Libraries and Frameworks
 - The .NET 9 SDK is used for building the application.

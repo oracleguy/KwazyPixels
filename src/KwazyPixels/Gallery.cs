@@ -43,6 +43,11 @@ public class Gallery
     public string Path { get; }
 
     /// <summary>
+    /// Gets the total number of images in the gallery.
+    /// </summary>
+    public int TotalImageCount => images.Count;
+
+    /// <summary>
     /// Gets the next image in the gallery, cycling back to the start if at the end.
     /// </summary>
     /// <returns></returns>
