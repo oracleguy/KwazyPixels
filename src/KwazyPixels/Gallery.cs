@@ -7,18 +7,29 @@ public class Gallery
 {
     private readonly FileSystemWatcher watcher;
     private static readonly string[] ImageExtensions = [".jpg", ".jpeg", ".png", ".webp", ".heif", ".heic"];
-    private readonly List<string> images = new();
+    private readonly List<IImage> images = new();
     private int currentIndex = 0;
     private readonly Lock imagesLock = new();
+    private readonly IImageFactory ImageFactory;
 
-    public Gallery(string name, string path)
+    /// <summary>
+    /// Creates a new instance of the <see cref="Gallery"/> class.
+    /// </summary>
+    /// <param name="config"></param>
+    /// <param name="imageFactory"></param>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown if <paramref name="config"/> or <paramref name="imageFactory"/> is null.
+    /// </exception>
+    public Gallery(GalleryConfig config, IImageFactory imageFactory)
     {
-        Name = name;
-        Path = path;
+        ImageFactory = imageFactory ?? throw new ArgumentNullException(nameof(imageFactory));
+        ArgumentNullException.ThrowIfNull(config, nameof(config));
+        Name = config.Name;
+        Path = config.Path;
 
         PopulateImages();
 
-        watcher = new FileSystemWatcher(path)
+        watcher = new FileSystemWatcher(config.Path)
         {
             NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite,
             Filter = "*.*",
@@ -64,7 +75,7 @@ public class Gallery
 
             var image = images[currentIndex];
             currentIndex = (currentIndex + 1) % images.Count;
-            return image;
+            return image.Path;
         }
     }
 
@@ -77,17 +88,19 @@ public class Gallery
                 switch (e.ChangeType)
                 {
                     case WatcherChangeTypes.Created:
-                        images.Add(e.FullPath);
+                        images.Add(ImageFactory.Create(e.FullPath));
                         break;
                     case WatcherChangeTypes.Deleted:
-                        images.Remove(e.FullPath);
+                        var image = images.FirstOrDefault(img => img.Path.Equals(e.FullPath, StringComparison.InvariantCultureIgnoreCase));
+                        if(image != null)
+                            images.Remove(image);
                         break;
                     case WatcherChangeTypes.Renamed:
                         var x = (RenamedEventArgs)e;
-                        var index = images.IndexOf(x.OldFullPath);
+                        var index = images.FindIndex(img => img.Path.Equals(x.OldFullPath, StringComparison.InvariantCultureIgnoreCase));
                         if (index >= 0)
                         {
-                            images[index] = x.FullPath;
+                            images[index] = ImageFactory.Create(x.FullPath);
                         }
                         break;
                 }
@@ -111,7 +124,7 @@ public class Gallery
                 {
                     if (IsImageFile(file))
                     {
-                        images.Add(file);
+                        images.Add(ImageFactory.Create(file));
                     }
                 }
             }

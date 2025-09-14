@@ -6,9 +6,11 @@
 internal class GalleryCollection : IGalleryCollection
 {
     private readonly List<Gallery> galleries = new();
+    private readonly IImageFactory ImageFactory;
 
-    public GalleryCollection(IConfiguration configuration, ILogger<GalleryCollection> logger)
+    public GalleryCollection(IConfiguration configuration, ILogger<GalleryCollection> logger, IImageFactory imageFactory)
     {
+        ImageFactory = imageFactory;
         try
         {
             LoadGalleries(configuration, logger);
@@ -44,7 +46,7 @@ internal class GalleryCollection : IGalleryCollection
                 {
                     throw new InvalidOperationException($"Gallery path '{config.Path}' for '{config.Name}' does not exist.");
                 }
-                var gallery = new Gallery(config.Name, config.Path);
+                var gallery = new Gallery(config, ImageFactory);
                 if (gallery.TotalImageCount == 0)
                 {
                     logger.LogWarning("Gallery '{Name}' contains no images.", config.Name);

@@ -7,6 +7,10 @@ namespace KwazyPixels;
 /// </summary>
 public class Program
 {
+    /// <summary>
+    /// The entry point of the application.
+    /// </summary>
+    /// <param name="args">The command line arguments passed to the application.</param>
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +23,7 @@ public class Program
         builder.Services.AddSingleton<IGalleryCollection, Services.GalleryCollection>();
         builder.Services.AddTransient<IImageProcessor, Services.ImageProcessor>();
         builder.Services.AddSingleton<Microsoft.IO.RecyclableMemoryStreamManager>();
+        builder.Services.AddSingleton<IImageFactory, Images.ImageFactory>();
 
         // Add services to the container.
         builder.Services.AddControllers().AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter()));
