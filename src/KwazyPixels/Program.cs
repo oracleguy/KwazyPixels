@@ -33,12 +33,12 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(options =>
         {
-            options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+            options.SwaggerDoc("v1", new Microsoft.OpenApi.OpenApiInfo
             {
                 Version = "v1",
                 Title = "Kwazy Pixels API",
                 Description = "API for serving a gallary of images for multiple uses.",
-                Contact = new Microsoft.OpenApi.Models.OpenApiContact
+                Contact = new Microsoft.OpenApi.OpenApiContact
                 {
                     Name = "KwazyPixels Git Repository",
                     Url = new Uri("https://github.com/oracleguy/KwazyPixels")
