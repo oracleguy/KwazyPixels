@@ -9,7 +9,7 @@ This project is a web API application that provides image randomization and gall
 - The `Dockerfile` is located at `src/KwazyPixels/Dockerfile`.
 
 ## Libraries and Frameworks
-- The .NET 9 SDK is used for building the application.
+- The .NET 10 SDK is used for building the application.
 - `PhotoSauce.MagicScaler` is used for image processing.
 - The NUnit framework is used for unit testing.
 - Swagger is used for API documentation.
